@@ -7,7 +7,7 @@
 	export let itemHeight = undefined;
 	export let itemKey = undefined;
 
-	let foo;
+	let itemsLength = 0;
 
 	// read-only, but visible to consumers via bind:start
 	export let start = 0;
@@ -62,7 +62,13 @@
 
 		bottom = remaining * average_height;
 		height_map.length = items.length;
-		viewport.scrollTo(0, 0);
+
+
+		// Stop gap way to scroll back to top when list has changed
+		if (itemsLength !== items.length) {
+			itemsLength = items.length;
+			viewport.scrollTo(0, 0);
+		}
 
 	}
 
