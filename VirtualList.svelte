@@ -2,12 +2,13 @@
 	import { onMount, tick } from 'svelte';
 
 	// props
+	export let height = "100%";
 	export let items;
-	export let height = '100%';
 	export let itemHeight = undefined;
 	export let itemKey = undefined;
 
 	let itemsLength = 0;
+	let clientHeight;
 
 	// read-only, but visible to consumers via bind:start
 	export let start = 0;
@@ -152,8 +153,15 @@
 </script>
 
 <style>
+	svelte-virtual-list-viewport-wrapper {
+		display: block;
+		height: 100%; 
+		overflow: hidden;
+	}
+
 	svelte-virtual-list-viewport {
 		position: relative;
+		height: 100%;
 		overflow-y: auto;
 		-webkit-overflow-scrolling:touch;
 		display: block;
@@ -168,20 +176,22 @@
 	}
 </style>
 
-<svelte-virtual-list-viewport
-	bind:this={viewport}
-	bind:offsetHeight={viewport_height}
-	on:scroll={handle_scroll}
-	style="height: {height};"
->
-	<svelte-virtual-list-contents
-		bind:this={contents}
-		style="padding-top: {top}px; padding-bottom: {bottom}px;"
+<svelte-virtual-list-viewport-wrapper bind:clientHeight style="height: {height};">
+	<svelte-virtual-list-viewport
+		bind:this={viewport}
+		bind:offsetHeight={viewport_height}
+		on:scroll={handle_scroll}
+		style={clientHeight && `height: ${clientHeight}px`}
 	>
-		{#each visible as row (getKey(row))}
-			<svelte-virtual-list-row>
-				<slot item={row.data} index={row.index}>Missing template</slot>
-			</svelte-virtual-list-row>
-		{/each}
-	</svelte-virtual-list-contents>
-</svelte-virtual-list-viewport>
+		<svelte-virtual-list-contents
+			bind:this={contents}
+			style="padding-top: {top}px; padding-bottom: {bottom}px;"
+		>
+			{#each visible as row (getKey(row))}
+				<svelte-virtual-list-row>
+					<slot item={row.data} index={row.index}>Missing template</slot>
+				</svelte-virtual-list-row>
+			{/each}
+		</svelte-virtual-list-contents>
+	</svelte-virtual-list-viewport>
+</svelte-virtual-list-viewport-wrapper>
